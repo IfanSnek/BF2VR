@@ -18,7 +18,7 @@ Extract to a folder, then whitelist that folder in Windows Defender/Antivirus.
 
 3) Open your OpenXR runtime (Oculus grid area, SteamVR mountains, Virtual Desktop just neads to have VDXR enabled)
 
-4) Double click `Launcher.exe`. The VR will show the game now, see the controls section.
+4) Double click `Loader.exe`. The VR will show the game now, see the controls section.
 
 5) (Optional) Use the delete key to eject. This will crash the game sometimes but it's worth it if you would need to close the game for some reason anyway.
 
