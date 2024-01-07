@@ -123,7 +123,7 @@ namespace BF2VR {
             XrSwapchainCreateInfo swapchainCreateInfo = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
             XrSwapchain swapchain;
             swapchainCreateInfo.arraySize = 1;
-            swapchainCreateInfo.format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+            swapchainCreateInfo.format = DXGI_FORMAT_R16G16B16A16_FLOAT;
             swapchainCreateInfo.width = swapchainWidth;
             swapchainCreateInfo.height = swapchainHeight;
             swapchainCreateInfo.mipCount = 1;
@@ -155,7 +155,7 @@ namespace BF2VR {
             std::vector<ID3D11RenderTargetView*> rtvs;
             for (const auto& swapchainImage : swapchainImages) {
                 D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-                rtvDesc.Format = xrRTVs.size() == 2 ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;  // UI gets SRGB
+                rtvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
                 rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
                 rtvDesc.Texture2D.MipSlice = 0;
                 ID3D11RenderTargetView* rtv;
@@ -418,6 +418,9 @@ namespace BF2VR {
         swapchainImageAcquireInfo = { XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
         result = xrAcquireSwapchainImage(xrSwapchains.at(2), &swapchainImageAcquireInfo,
             &uiSwapchainImageIndex);
+        if (result == XR_ERROR_CALL_ORDER_INVALID) {
+            return;  // Ignore
+        }
         if (result != XR_SUCCESS) {
             Logging::Log("[OPENXR] Could not acquire swapchain image for UI", result);
         }
