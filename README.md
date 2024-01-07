@@ -25,9 +25,6 @@ Extract to a folder, then whitelist that folder in Windows Defender/Antivirus.
 ### Mandatory settings:
 * DirectX 12 - Off
 * TAA - High (it's disabled anyway but it must be on high)
-
-### Recommended settings
-* Resolution scale - up to around 120% if possible
 * Window mode - borderless
 
 ### Controls
