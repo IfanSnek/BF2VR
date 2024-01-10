@@ -26,6 +26,18 @@ namespace BF2VR {
             return;
         }
 
+        if (!hasBeganFrame && OpenXRService::leftEye) {
+            // Start on left eye
+            OpenXRService::WaitBeginFrame();
+            hasBeganFrame = true;
+        }
+
+        if (!hasBeganDrawing) {
+            // Start on left eye
+            OpenXRService::BeforeDraw();
+            hasBeganDrawing = true;
+        }
+
         // Aquire openxr RTV
         int CurrentEye = OpenXRService::leftEye ? 0 : 1;
         ID3D11RenderTargetView* xrRTV = OpenXRService::xrRTVs.at(CurrentEye).at(OpenXRService::swapchainImageIndex);
@@ -82,17 +94,15 @@ namespace BF2VR {
             toReturn = presentHook.call<HRESULT>(swapChain, syncInterval, flags);
         }
 
-        // Present implies all drawing is done for the game's frame
-        OpenXRService::AfterDraw();
-
-        // On the right eye present, the entire VR frame loop is complete, so end and begin for next time
-        if (!OpenXRService::leftEye) {
-            OpenXRService::EndFrame();  // This may be called on the very fist frame resulting in invalid call order
-            OpenXRService::WaitBeginFrame();
+        if (hasBeganDrawing) {
+            OpenXRService::AfterDraw();
+            hasBeganDrawing = false;
         }
 
-        // Before draw in anticipation for next draw calls
-        OpenXRService::BeforeDraw();
+        if (!OpenXRService::leftEye && hasBeganFrame) {
+            OpenXRService::EndFrame();
+            hasBeganFrame = false;
+        }
 
         // Clear the RTV for the HUD
         ID3D11RenderTargetView* uiRTV = OpenXRService::xrRTVs.at(2).at(OpenXRService::swapchainImageIndex);

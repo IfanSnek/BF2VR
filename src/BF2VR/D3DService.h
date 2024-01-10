@@ -42,6 +42,9 @@ class D3DService {
 
     static inline ID3D11VertexShader* pVertexShader = nullptr;
     static inline ID3D11PixelShader* pPixelShader = nullptr;
+
+    static inline bool hasBeganFrame = false;
+    static inline bool hasBeganDrawing = false;
 };
 
 }  // namespace BF2VR

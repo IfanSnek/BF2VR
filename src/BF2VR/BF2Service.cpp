@@ -72,11 +72,14 @@ namespace BF2VR {
             if (worldRenderSettings->aaDisocclusionFactor != 1.f) {
                 worldRenderSettings->aaDisocclusionFactor = 1.f;
             }
+            if (worldRenderSettings->localReflectionEnable) {
+                worldRenderSettings->localReflectionEnable = false;
+            }
         }
 
         // Set post options for the user
         if (isValidPtr(postSettings)) {
-            postSettings->ScreenSpaceRaytraceUseVelocityVectorsForTemporal = true;
+            postSettings->ScreenSpaceRaytraceEnable = false;
             postSettings->LensDistortionAllowed = false;
             postSettings->forceDofEnable = true;
             postSettings->forceDofBlurFactor = 0.f;
@@ -139,7 +142,7 @@ namespace BF2VR {
             return;
         }
         view->projectionMatrix = projMatrix;
-        // view->aspectRatio = static_cast<float>(OpenXRService::swapchainWidth) / static_cast<float>(OpenXRService::swapchainHeight);
+        view->aspectRatio = static_cast<float>(OpenXRService::swapchainWidth) / static_cast<float>(OpenXRService::swapchainHeight);
     }
 
     __int64 BF2Service::PostUpdate(void* a1, __int64 a2, GlobalPostProcessSettings* settings) {
@@ -237,6 +240,7 @@ namespace BF2VR {
 
         if (isValidPtr(postSettings)) {
             postSettings->forceDofEnable = false;
+            postSettings->ScreenSpaceRaytraceEnable = true;
         }
 
         return 0;
