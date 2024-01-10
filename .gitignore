@@ -2,3 +2,5 @@
 /.idea/
 /.vs/
 /out/
+/scripts/.idea/
+/scripts/dump/*
