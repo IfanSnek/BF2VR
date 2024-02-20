@@ -78,7 +78,6 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
             Logging::Log("[CORE] Unable to bring window to front. Click the window to get motion controls.");
         }
 
-        Sleep(5000);  // Safeguard so the mod isn't ejected right away
         while (true) {
             if (GetAsyncKeyState(VK_END)) {
                 break;
@@ -106,8 +105,9 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
         }
 
         Logging::Log("[BF2] Initializing BF2Service...");
-        if (BF2Service::Initialize() != 0)
+        if (BF2Service::Initialize() != 0) {
             Shutdown(setupLevel, hModule);
+        }
         setupLevel++;
 
         Logging::Log("[OPENXR] Loading OpenXR...");
@@ -117,12 +117,14 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
         setupLevel++;
 
         Logging::Log("[OPENXR] Loading Actions...");
-        if (ActionsService::Initialize() != 0)
+        if (ActionsService::Initialize() != 0) {
             Shutdown(setupLevel, hModule);
+        }
 
         Logging::Log("[D3D11] Hooking DirectX...");
-        if (D3DService::Initialize() != 0)
+        if (D3DService::Initialize() != 0) {
             Shutdown(setupLevel, hModule);
+        }
         setupLevel++;
 
         FinalizeAsIs(setupLevel, hModule);

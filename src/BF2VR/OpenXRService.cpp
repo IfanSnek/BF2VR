@@ -108,12 +108,6 @@ namespace BF2VR {
         swapchainWidth = xrConfigViews[0].recommendedImageRectWidth;
         swapchainHeight = xrConfigViews[0].recommendedImageRectHeight;
 
-        Screen* screen = DXRenderer::getScreen();
-        if (isValidPtr(screen)) {
-            screen->bufferWidth = swapchainWidth;
-            screen->bufferheight = swapchainHeight;
-        }
-
         Logging::Log("[OPENXR] Width: " + std::to_string(swapchainWidth) + ", Height: " + std::to_string(swapchainHeight));
 
 
@@ -293,7 +287,7 @@ namespace BF2VR {
             Vec3 vecPos = Vec3(hudTransform.position.x, hudTransform.position.y, hudTransform.position.z);
             Vec4 quat = Vec4(hudTransform.orientation.x, hudTransform.orientation.y, hudTransform.orientation.z, hudTransform.orientation.w);
             Vec3 euler = eulerFromQuat(quat);
-            Vec3 vecOffset = Vec3(.15f, .2f, -0.6f);
+            Vec3 vecOffset = Vec3(.25f, .2f, -1.f);
             vecPos = rotateAround(vecOffset, vecPos, -euler.y);
             hudTransform.position = { vecPos.x, vecPos.y, vecPos.z };
             hudPose = hudTransform;

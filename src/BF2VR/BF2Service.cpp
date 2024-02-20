@@ -75,11 +75,17 @@ namespace BF2VR {
             if (worldRenderSettings->localReflectionEnable) {
                 worldRenderSettings->localReflectionEnable = false;
             }
+            if (worldRenderSettings->motionBlurEnable) {
+                worldRenderSettings->motionBlurEnable = false;
+            }
+            if (worldRenderSettings->specularLightingEnable) {
+                worldRenderSettings->specularLightingEnable = false;
+            }
         }
 
         // Set post options for the user
         if (isValidPtr(postSettings)) {
-            postSettings->ScreenSpaceRaytraceEnable = false;
+            postSettings->ScreenSpaceRaytraceEnable = true;
             postSettings->LensDistortionAllowed = false;
             postSettings->forceDofEnable = true;
             postSettings->forceDofBlurFactor = 0.f;
@@ -135,19 +141,14 @@ namespace BF2VR {
         return toReturn;
     }
 
-    void BF2Service::BuildViews(RenderView* view, const char* viewType, UINT someFlag) {
-        buildViewsHook.call(view, viewType, someFlag);
-
+    void BF2Service::BuildViews(RenderView* view) {
         if (!OpenXRService::xrRunning) {
             return;
         }
-        view->projectionMatrix = projMatrix;
-        view->aspectRatio = static_cast<float>(OpenXRService::swapchainWidth) / static_cast<float>(OpenXRService::swapchainHeight);
-    }
 
-    __int64 BF2Service::PostUpdate(void* a1, __int64 a2, GlobalPostProcessSettings* settings) {
-        postSettings = settings;
-        return postHook.call<__int64>(a1, a2, settings);;
+        view->projectionMatrix = projMatrix;
+        view->fov = 1.6f;  // Good enough
+        view->aspectRatio = static_cast<float>(OpenXRService::swapchainWidth) / static_cast<float>(OpenXRService::swapchainHeight);
     }
 
     void BF2Service::GamepadUpdate(GamepadState* state) {
@@ -190,35 +191,50 @@ namespace BF2VR {
             return -1;
         }
 
-        buildViewsHook = safetyhook::create_inline(reinterpret_cast<void*>(OFFSETBUILDVIEWS), reinterpret_cast<void*>(BuildViews));
+
+        safetyhook::MidHookFn buildViewsFn = [](safetyhook::Context& ctx) {
+            BuildViews(reinterpret_cast<RenderView*>(ctx.rbx));
+        };
+        buildViewsHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETBUILDVIEWS), buildViewsFn);
         if (!buildViewsHook) {
             Logging::Log("[BF2] Viewbuilder hook failed to install");
             return -1;
         }
 
-        postHook = safetyhook::create_inline(reinterpret_cast<void*>(OFFSETPOST), reinterpret_cast<void*>(PostUpdate));
+
+        safetyhook::MidHookFn resizeScreenFn = [](safetyhook::Context& ctx) {
+            Screen* screen = reinterpret_cast<Screen*>(ctx.rbx);
+            screen->bufferWidth = OpenXRService::swapchainWidth;
+            screen->bufferHeight = OpenXRService::swapchainHeight;
+        };
+        resizeScreenHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETRESIZESCREEN), resizeScreenFn);
+        if (!resizeScreenHook) {
+            Logging::Log("[BF2] Screen resizer hook failed to install");
+            return -1;
+        }
+
+        safetyhook::MidHookFn postFn = [](safetyhook::Context& ctx) {
+            GlobalPostProcessSettings* settings = reinterpret_cast<GlobalPostProcessSettings*>(ctx.rcx);
+            if (isValidPtr(postSettings)) {
+                return;
+            }
+            if(isValidPtr(settings)) {
+                postSettings = settings;
+            }
+        };
+        postHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETPOST), postFn);
         if (!postHook) {
             Logging::Log("[BF2] Post processing hook failed to install");
             return -1;
         }
 
-        for (int i = 0; i < 3; i++) {
-            safetyhook::MidHookFn fn = [](safetyhook::Context& ctx) {
-                GamepadUpdate(reinterpret_cast<GamepadState*>(ctx.rbx));
-            };
-            gamepadHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETGAMEPADUPDATE), fn);
-            if (!gamepadHook) {
-                // TODO(praydog): This sometimes fails when the trampoline is out of range. I think praydog is working on this for safetyhook
-                gamepadHook = {};
-                Logging::Log("[BF2] Gamepad hook failed to install, retrying in one second...");
-                Sleep(1000);
-            } else {
-                break;
-            }
-            if (i == 2) {
-                Logging::Log("[BF2] Gamepad hook failed to install. This is a known issue that is being worked on, relaunch the mod yourself or after switching a level.");
-                return -1;
-            }
+        safetyhook::MidHookFn gamepadUpdateFn = [](safetyhook::Context& ctx) {
+            GamepadUpdate(reinterpret_cast<GamepadState*>(ctx.rbx));
+        };
+        gamepadHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETGAMEPADUPDATE), gamepadUpdateFn);
+        if (!gamepadHook) {
+            Logging::Log("[BF2] Gamepad hook failed to install.");
+            return -1;
         }
 
         return 0;
@@ -227,8 +243,10 @@ namespace BF2VR {
     int BF2Service::Uninitialize() {
         cameraUpdateHook = {};
         buildViewsHook = {};
+        resizeScreenHook = {};
         postHook = {};
         gamepadHook = {};
+
         Logging::Log("[BF2] Hooks removed");
 
         GameRenderer* gameRenderer = GameRenderer::GetInstance();

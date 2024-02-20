@@ -33,11 +33,12 @@ class BF2Service {
     static inline SafetyHookInline cameraUpdateHook;
     static RenderView* CameraUpdate(RenderView* a1, RenderView* a2);
 
-    static inline SafetyHookInline buildViewsHook;
-    static void BuildViews(RenderView* view, const char* viewType, UINT someFlag);
+    static inline SafetyHookMid buildViewsHook;
+    static void BuildViews(RenderView* view);
 
-    static inline SafetyHookInline postHook;
-    static __int64 PostUpdate(void* a1, __int64 a2, GlobalPostProcessSettings* settings);
+    static inline SafetyHookMid resizeScreenHook;
+
+    static inline SafetyHookMid postHook;
 
     static inline SafetyHookMid gamepadHook;
     static void GamepadUpdate(GamepadState* state);

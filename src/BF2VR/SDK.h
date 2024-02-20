@@ -16,6 +16,7 @@
 #include <d3d11.h>
 #include <cstdint>
 #include "Types.h"
+#include <safetyhook.hpp>
 
 ///////////////////////////////////
 // Class offsets
@@ -36,11 +37,12 @@ static const DWORD64 OFFSETUISETTINGS = 0x143aebb80;
 ///////////////////////////////////
 
 static const DWORD64 OFFSETCAMERA = 0x146FD3E90;
-static const DWORD64 OFFSETBUILDVIEWS = 0x1414e8f10;
+static const DWORD64 OFFSETBUILDVIEWS = 0x147c4e1a4;
+static const DWORD64 OFFSETRESIZESCREEN = 0x147d94769;
 static const DWORD64 OFFSETPOSE = 0x142150910;
 static const DWORD64 OFFSETUIDRAW = 0x146D48180;
-static const DWORD64 OFFSETGAMEPADUPDATE = 0x14774d3fd;
-static const DWORD64 OFFSETPOST = 0x142b6cff0;
+static const DWORD64 OFFSETGAMEPADUPDATE = 0x14774d402;
+static const DWORD64 OFFSETPOST = 0x14c65a38f;
 
 
 ///////////////////////////////////
@@ -62,9 +64,9 @@ class Screen {
  public:
      char pad_0000[80];  //  0x0000
       uint32_t bufferWidth;  //  0x0050
-      uint32_t bufferheight;  //  0x0054
-      uint32_t anotherWidth;  //  0x0050
-      uint32_t anotherHeight;  //  0x0054
+      uint32_t bufferHeight;  //  0x0054
+      uint32_t anotherWidth;  //  0x0058
+      uint32_t anotherHeight;  //  0x005C
 };
 
 class DXRenderer {
@@ -164,9 +166,13 @@ class GameRenderer {
 
 class WorldRenderSettings {
  public:
-    char pad_0000[892];  // 0x0000
+    char pad_0000[428];  // 0x0000
+    bool motionBlurEnable;  // 0x01AC
+    char pad_01AD[463];  // 0x01AD
     float aaDisocclusionFactor;  // 0x037C
-    char pad_0378[507];  // 0x0378
+    char pad_0380[499]; //0x0380
+    bool specularLightingEnable;  // 0x050A
+    char pad_050B[104]; //0x050B
     bool localReflectionEnable;  // 0x0573
 
     static WorldRenderSettings* GetInstance() {

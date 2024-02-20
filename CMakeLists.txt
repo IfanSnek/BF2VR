@@ -9,8 +9,8 @@ set(SAFETYHOOK_FETCH_ZYDIS ON)
 include(FetchContent)
 FetchContent_Declare(
         safetyhook
-        GIT_REPOSITORY "https://github.com/IfanSnek/safetyhook.git"
-        GIT_TAG "origin/main"
+        GIT_REPOSITORY "https://github.com/cursey/safetyhook.git"
+        GIT_TAG "origin/test/thread-trapping"
 )
 FetchContent_MakeAvailable(safetyhook)
 

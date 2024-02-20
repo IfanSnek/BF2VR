@@ -47,15 +47,12 @@ namespace BF2VR {
 
         drawHook.call<void>(pContext, VertexCount, StartVertexLocation);
 
-        // Otherwise a small pass shows in the top left corner of the VR
-        if (VertexCount == 6) {
-            pContext->OMSetRenderTargets(1, &xrRTV, nullptr);
-            drawHook.call<void>(pContext, VertexCount, StartVertexLocation);
-        }
+        pContext->OMSetRenderTargets(1, &xrRTV, nullptr);
+        drawHook.call<void>(pContext, VertexCount, StartVertexLocation);
     }
 
     __int64 D3DService::uiDetour(__int64 param_1, __int64 param_2, __int64 param_3, int param_4, int param_5, int param_6, int param_7, __int64 param_8, __int64 param_9) {
-        if (!OpenXRService::xrRunning || !BF2Service::inGame) {
+        if (!OpenXRService::xrRunning) {
             return uiHook.call<__int64>(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9);
         }
 
@@ -182,7 +179,7 @@ namespace BF2VR {
         Screen* screen = DXRenderer::getScreen();
         if (isValidPtr(screen)) {
             screen->bufferWidth = screen->anotherWidth;
-            screen->bufferheight = screen->anotherHeight;
+            screen->bufferHeight = screen->anotherHeight;
         }
 
         return 0;
