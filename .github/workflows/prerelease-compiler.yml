@@ -32,7 +32,7 @@ jobs:
           ${{github.workspace}}/build/Loader.exe
 
     - uses: softprops/action-gh-release@v1
-        with:
+      with:
           files: prerelease.zip
           prerelease: true
         env:
