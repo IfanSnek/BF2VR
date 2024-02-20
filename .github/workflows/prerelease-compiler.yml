@@ -35,5 +35,5 @@ jobs:
       with:
           files: prerelease.zip
           prerelease: true
-        env:
+      env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
