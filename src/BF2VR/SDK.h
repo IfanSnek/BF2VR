@@ -39,10 +39,11 @@ static const DWORD64 OFFSETUISETTINGS = 0x143aebb80;
 static const DWORD64 OFFSETCAMERA = 0x146FD3E90;
 static const DWORD64 OFFSETBUILDVIEWS = 0x147c4e1a4;
 static const DWORD64 OFFSETRESIZESCREEN = 0x147d94769;
+static const DWORD64 OFFSETRESIZESCREENTRIGGER = 0x147d94769;  // Since the other one is a mid-hook
 static const DWORD64 OFFSETPOSE = 0x142150910;
 static const DWORD64 OFFSETUIDRAW = 0x146D48180;
 static const DWORD64 OFFSETGAMEPADUPDATE = 0x14774d402;
-static const DWORD64 OFFSETPOST = 0x14c65a38f;
+static const DWORD64 OFFSETPOST = 0x14c659a00;
 
 
 ///////////////////////////////////
@@ -62,11 +63,11 @@ static inline bool isValidPtr(PVOID p) {
 
 class Screen {
  public:
-     char pad_0000[80];  //  0x0000
-      uint32_t bufferWidth;  //  0x0050
-      uint32_t bufferHeight;  //  0x0054
-      uint32_t anotherWidth;  //  0x0058
-      uint32_t anotherHeight;  //  0x005C
+    char pad_0000[80];  //  0x0000
+    uint32_t bufferWidth;  //  0x0050
+    uint32_t bufferHeight;  //  0x0054
+    uint32_t anotherWidth;  //  0x0058
+    uint32_t anotherHeight;  //  0x005C
 };
 
 class DXRenderer {
@@ -170,9 +171,9 @@ class WorldRenderSettings {
     bool motionBlurEnable;  // 0x01AC
     char pad_01AD[463];  // 0x01AD
     float aaDisocclusionFactor;  // 0x037C
-    char pad_0380[499]; //0x0380
+    char pad_0380[394];  // 0x0380
     bool specularLightingEnable;  // 0x050A
-    char pad_050B[104]; //0x050B
+    char pad_050B[104];  // 0x050B
     bool localReflectionEnable;  // 0x0573
 
     static WorldRenderSettings* GetInstance() {

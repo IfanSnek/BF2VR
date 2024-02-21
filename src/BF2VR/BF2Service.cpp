@@ -83,9 +83,15 @@ namespace BF2VR {
             }
         }
 
+        Skybox* skybox = Skybox::GetInstance();
+        if (isValidPtr(skybox)) {
+            skybox->mapping = {};
+            skybox->mapping.y.z = 35;  // Makes it not washed out
+        }
+
         // Set post options for the user
         if (isValidPtr(postSettings)) {
-            postSettings->ScreenSpaceRaytraceEnable = true;
+            postSettings->ScreenSpaceRaytraceEnable = false;
             postSettings->LensDistortionAllowed = false;
             postSettings->forceDofEnable = true;
             postSettings->forceDofBlurFactor = 0.f;
@@ -147,7 +153,8 @@ namespace BF2VR {
         }
 
         view->projectionMatrix = projMatrix;
-        view->fov = 1.6f;  // Good enough
+        view->orthoWidth = static_cast<float>(OpenXRService::swapchainWidth);
+        view->orthoHeight = static_cast<float>(OpenXRService::swapchainHeight);
         view->aspectRatio = static_cast<float>(OpenXRService::swapchainWidth) / static_cast<float>(OpenXRService::swapchainHeight);
     }
 
@@ -214,11 +221,11 @@ namespace BF2VR {
         }
 
         safetyhook::MidHookFn postFn = [](safetyhook::Context& ctx) {
-            GlobalPostProcessSettings* settings = reinterpret_cast<GlobalPostProcessSettings*>(ctx.rcx);
+            GlobalPostProcessSettings* settings = reinterpret_cast<GlobalPostProcessSettings*>(ctx.r8);
             if (isValidPtr(postSettings)) {
                 return;
             }
-            if(isValidPtr(settings)) {
+            if (isValidPtr(settings)) {
                 postSettings = settings;
             }
         };

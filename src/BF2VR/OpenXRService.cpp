@@ -107,7 +107,6 @@ namespace BF2VR {
 
         swapchainWidth = xrConfigViews[0].recommendedImageRectWidth;
         swapchainHeight = xrConfigViews[0].recommendedImageRectHeight;
-
         Logging::Log("[OPENXR] Width: " + std::to_string(swapchainWidth) + ", Height: " + std::to_string(swapchainHeight));
 
 
