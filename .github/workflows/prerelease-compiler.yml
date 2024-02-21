@@ -27,5 +27,14 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: prerelease
-        path: ${{github.workspace}}/build/
+        path: |
+          ${{github.workspace}}/build/BF2VR.dll
+          ${{github.workspace}}/build/Loader.exe
 
+    - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: prerelease.zip
+          prerelease: true
+      env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
