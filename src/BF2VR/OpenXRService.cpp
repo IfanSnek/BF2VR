@@ -165,7 +165,7 @@ namespace BF2VR {
 
         // Step 9: Create app space
         XrReferenceSpaceCreateInfo spaceCreateInfo = { XR_TYPE_REFERENCE_SPACE_CREATE_INFO };
-        spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
+        spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
         spaceCreateInfo.poseInReferenceSpace = { {0, 0, 0, 1},
                                                 {0, 0, 0} };
         result = xrCreateReferenceSpace(xrSession, &spaceCreateInfo, &xrSpace);
@@ -282,7 +282,7 @@ namespace BF2VR {
 
         // Update HUD pose
         if (leftEye) {
-            XrPosef hudTransform = hudPose = xrViews.at(0).pose;
+            XrPosef hudTransform = xrViews.at(0).pose;
             Vec3 vecPos = Vec3(hudTransform.position.x, hudTransform.position.y, hudTransform.position.z);
             Vec4 quat = Vec4(hudTransform.orientation.x, hudTransform.orientation.y, hudTransform.orientation.z, hudTransform.orientation.w);
             Vec3 euler = eulerFromQuat(quat);

@@ -81,6 +81,12 @@ namespace BF2VR {
             if (worldRenderSettings->specularLightingEnable) {
                 worldRenderSettings->specularLightingEnable = false;
             }
+            if (worldRenderSettings->csLightTileCsPathEnable) {
+                worldRenderSettings->csLightTileCsPathEnable = false;
+            }
+            if (worldRenderSettings->outdoorLightEnable) {
+                worldRenderSettings->outdoorLightEnable = false;
+            }
         }
 
         Skybox* skybox = Skybox::GetInstance();

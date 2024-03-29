@@ -74,6 +74,10 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
         if (ownWindow) {
             SetForegroundWindow(ownWindow);
             SetActiveWindow(ownWindow);
+            RECT rect;
+            GetWindowRect(ownWindow, &rect);
+            SetWindowPos(ownWindow, 0, 0, 0, rect.right - 1, rect.bottom, 0);
+            SetWindowPos(ownWindow, 0, 0, 0, rect.right + 1, rect.bottom, 0);
         } else {
             Logging::Log("[CORE] Unable to bring window to front. Click the window to get motion controls.");
         }
@@ -84,6 +88,12 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
             }
         }
 
+        RECT rect;
+        if (ownWindow) {
+            GetWindowRect(ownWindow, &rect);
+            SetWindowPos(ownWindow, 0, 0, 0, rect.right - 1, rect.bottom, 0);
+            SetWindowPos(ownWindow, 0, 0, 0, rect.right + 1, rect.bottom, 0);
+        }
         Shutdown(setupLevel, hModule);
     }
 

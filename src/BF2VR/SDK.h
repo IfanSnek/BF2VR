@@ -39,7 +39,6 @@ static const DWORD64 OFFSETUISETTINGS = 0x143aebb80;
 static const DWORD64 OFFSETCAMERA = 0x146FD3E90;
 static const DWORD64 OFFSETBUILDVIEWS = 0x147c4e1a4;
 static const DWORD64 OFFSETRESIZESCREEN = 0x147d94769;
-static const DWORD64 OFFSETRESIZESCREENTRIGGER = 0x147d94769;  // Since the other one is a mid-hook
 static const DWORD64 OFFSETPOSE = 0x142150910;
 static const DWORD64 OFFSETUIDRAW = 0x146D48180;
 static const DWORD64 OFFSETGAMEPADUPDATE = 0x14774d402;
@@ -68,6 +67,16 @@ class Screen {
     uint32_t bufferHeight;  //  0x0054
     uint32_t anotherWidth;  //  0x0058
     uint32_t anotherHeight;  //  0x005C
+
+    static Screen* getInstance() {
+        DWORD64 ptr1 = *((DWORD64*)0x143d11f80);
+        DWORD64* ptr2 = *((DWORD64**)(ptr1 + 0x80));
+        Screen* instance = *((Screen**)ptr2);
+        if (isValidPtr(instance)) {
+            return instance;
+        }
+        return nullptr;
+    }
 };
 
 class DXRenderer {
@@ -173,7 +182,11 @@ class WorldRenderSettings {
     float aaDisocclusionFactor;  // 0x037C
     char pad_0380[394];  // 0x0380
     bool specularLightingEnable;  // 0x050A
-    char pad_050B[104];  // 0x050B
+    char pad_050B[5];  // 0x050B
+    char outdoorLightEnable;
+    char pad_0511[8];  // 0x0511
+    bool csLightTileCsPathEnable;  // 0x0159
+    char pad_051A[89];  // 0x051A
     bool localReflectionEnable;  // 0x0573
 
     static WorldRenderSettings* GetInstance() {
