@@ -67,16 +67,6 @@ class Screen {
     uint32_t bufferHeight;  //  0x0054
     uint32_t anotherWidth;  //  0x0058
     uint32_t anotherHeight;  //  0x005C
-
-    static Screen* getInstance() {
-        DWORD64 ptr1 = *((DWORD64*)0x143d11f80);
-        DWORD64* ptr2 = *((DWORD64**)(ptr1 + 0x80));
-        Screen* instance = *((Screen**)ptr2);
-        if (isValidPtr(instance)) {
-            return instance;
-        }
-        return nullptr;
-    }
 };
 
 class DXRenderer {

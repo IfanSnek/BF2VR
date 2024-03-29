@@ -62,7 +62,7 @@ Upload the `BF2VR.txt` file in `Documents/BF2VR` when you open an issue. If appl
 ## Contributing
 
 Pull requests are very welcome. Please use Google's C++ style guide. You can download [cpplint](https://pypi.org/project/cpplint/) and run the following in the /src/ directory:
-` cpplint --linelength 1000 --recursive .`
+`cpplint --linelength 1000 --recursive ./src`
 
 ## License
 BF2VR is licensed under the GPL-3.0 license (see LICENSE file).

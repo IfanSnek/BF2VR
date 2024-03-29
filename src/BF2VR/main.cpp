@@ -60,6 +60,15 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
         if (setupLevel >= 1) {
             Logging::Log("[BF2] Unhooking BF2Service..");
             BF2Service::Uninitialize();
+
+            // Reset window
+            RECT rect;
+            HWND ownWindow = FindWindowA("Frostbite", "STAR WARS Battlefront II");
+            if (ownWindow) {
+                GetWindowRect(ownWindow, &rect);
+                SetWindowPos(ownWindow, 0, 0, 0, rect.right - 1, rect.bottom, 0);
+                SetWindowPos(ownWindow, 0, 0, 0, rect.right + 1, rect.bottom, 0);
+            }
         }
 
         Logging::Log("[CORE] BF2VR unloaded, You may now close this window");
@@ -86,13 +95,6 @@ $$$$$$$  |$$ |      $$$$$$$$\    \$  /   $$ |  $$ |
             if (GetAsyncKeyState(VK_END)) {
                 break;
             }
-        }
-
-        RECT rect;
-        if (ownWindow) {
-            GetWindowRect(ownWindow, &rect);
-            SetWindowPos(ownWindow, 0, 0, 0, rect.right - 1, rect.bottom, 0);
-            SetWindowPos(ownWindow, 0, 0, 0, rect.right + 1, rect.bottom, 0);
         }
         Shutdown(setupLevel, hModule);
     }
