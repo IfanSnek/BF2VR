@@ -14,6 +14,7 @@
 #include <ShlObj.h>
 #include <Dbghelp.h>
 #include <iostream>
+#include <chrono>
 
 namespace BF2VR {
     void Logging::Log(const std::string& message, int code) {
