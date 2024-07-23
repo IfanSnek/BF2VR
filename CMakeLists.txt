@@ -10,7 +10,7 @@ include(FetchContent)
 FetchContent_Declare(
         safetyhook
         GIT_REPOSITORY "https://github.com/cursey/safetyhook.git"
-        GIT_TAG "origin/test/thread-trapping"
+        GIT_TAG "origin/main"
 )
 FetchContent_MakeAvailable(safetyhook)
 

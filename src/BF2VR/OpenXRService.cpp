@@ -35,7 +35,7 @@ namespace BF2VR {
         createInfo.enabledExtensionNames = extensions;
 
         // Step 2: Create the instance
-        createInfo.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
+        createInfo.applicationInfo.apiVersion = XR_API_VERSION_1_0;
         strcpy_s(createInfo.applicationInfo.applicationName, "Star Wars Battlefront II VR");
         XrResult result = xrCreateInstance(&createInfo, &xrInstance);
         if (result != XR_SUCCESS) {
