@@ -55,6 +55,11 @@ class OpenXRService {
     static inline std::vector<XrSwapchain> xrSwapchains;
     static inline std::vector<XrViewConfigurationView> xrConfigViews;
     static inline uint32_t xrViewCount;
+
+    static inline std::vector<int64_t> xrFormats;
+    static inline DXGI_FORMAT  xrFormat;
+    static inline uint32_t xrFormatCount;
+
     static inline std::vector<XrCompositionLayerProjectionView> xrProjectionViews;
     static inline XrCompositionLayerQuad xrUIView;
     static inline uint32_t xrProjectionViewCount;

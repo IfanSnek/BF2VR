@@ -37,14 +37,22 @@ class D3DService {
     static inline SafetyHookInline drawHook;
     static void DrawDetour(ID3D11DeviceContext* pContext, UINT VertexCount, UINT StartVertexLocation);
 
-    static inline SafetyHookInline uiHook;
-    static __int64 uiDetour(__int64 param_1, __int64 param_2, __int64 param_3, int param_4, int param_5, int param_6, int param_7, __int64 param_8,  __int64 param_9);
+    static inline SafetyHookMid uiHook;
+    static void OnUIDraw();
 
     static inline ID3D11VertexShader* pVertexShader = nullptr;
     static inline ID3D11PixelShader* pPixelShader = nullptr;
 
-    static inline bool hasBeganFrame = false;
-    static inline bool hasBeganDrawing = false;
+    enum DrawStage {
+       WAITED,
+       DRAWING_L,
+       DRAWN_L,
+       DRAWING_R,
+       DRAWN_R,
+       COMPLETE
+    };
+
+    static inline DrawStage drawStage = COMPLETE;
 };
 
 }  // namespace BF2VR

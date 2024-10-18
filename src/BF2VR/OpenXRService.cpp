@@ -110,13 +110,33 @@ namespace BF2VR {
         Logging::Log("[OPENXR] Width: " + std::to_string(swapchainWidth) + ", Height: " + std::to_string(swapchainHeight));
 
 
+        // Step 7.5: Get XR swapchain formats
+        XrResult xr = xrEnumerateSwapchainFormats(xrSession, 0, &xrFormatCount, nullptr);
+        if (result != XR_SUCCESS) {
+            Logging::Log("[OPENXR] Could not enumerate swapchain formats", result);
+            return -1;
+        }
+        xrFormats.resize(xrFormatCount);
+        xr = xrEnumerateSwapchainFormats(xrSession, xrFormatCount, &xrFormatCount, xrFormats.data());
+        if (result != XR_SUCCESS) {
+            Logging::Log("[OPENXR] Could not enumerate swapchain formats", result);
+            return -1;
+        }
+        if (xrFormatCount == 0) {
+            Logging::Log("[OPENXR] No xr formats were found");
+            return -1;
+        }
+        xrFormat = static_cast<DXGI_FORMAT>(xrFormats.at(0));
+
+        Logging::Log("[OPENXR] Using swapchain format: " + std::to_string(xrFormat));
+
         // Step 8: Create swapchains (with one for the UI)
         for (uint32_t i = 0; i < xrViewCount + 1; i++) {
             // Create swapchain
             XrSwapchainCreateInfo swapchainCreateInfo = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
             XrSwapchain swapchain;
             swapchainCreateInfo.arraySize = 1;
-            swapchainCreateInfo.format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+            swapchainCreateInfo.format = xrFormat;
             swapchainCreateInfo.width = swapchainWidth;
             swapchainCreateInfo.height = swapchainHeight;
             swapchainCreateInfo.mipCount = 1;
@@ -148,7 +168,7 @@ namespace BF2VR {
             std::vector<ID3D11RenderTargetView*> rtvs;
             for (const auto& swapchainImage : swapchainImages) {
                 D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-                rtvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+                rtvDesc.Format = xrFormat;
                 rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
                 rtvDesc.Texture2D.MipSlice = 0;
                 ID3D11RenderTargetView* rtv;
@@ -359,6 +379,23 @@ namespace BF2VR {
             Logging::Log("[OPENXR] Could not begin frame", result);
             return;
         }
+
+        // Wait on the UI (since we only do it once here as opposed to once per 2 eyes)
+        XrSwapchainImageAcquireInfo swapchainImageAcquireInfo = { XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
+        swapchainImageAcquireInfo = { XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
+        result = xrAcquireSwapchainImage(xrSwapchains.at(2), &swapchainImageAcquireInfo,
+            &uiSwapchainImageIndex);
+        if (result != XR_SUCCESS) {
+            Logging::Log("[OPENXR] Could not acquire swapchain image for UI", result);
+        }
+
+        XrSwapchainImageWaitInfo swapchainImageWaitInfo = { XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
+        swapchainImageWaitInfo = { XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
+        swapchainImageWaitInfo.timeout = XR_INFINITE_DURATION;
+        result = xrWaitSwapchainImage(xrSwapchains.at(2), &swapchainImageWaitInfo);
+        if (result != XR_SUCCESS) {
+            Logging::Log("[OPENXR] Could not wait on swapchain image for UI", result);
+        }
     }
 
     void OpenXRService::BeforeDraw() {
@@ -389,7 +426,7 @@ namespace BF2VR {
         xrUIView.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
         xrUIView.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
         xrUIView.space = xrSpace;
-        xrUIView.size = { 1.0f, 1.0f };
+        xrUIView.size = { 1.0f, 1.0f  };
         xrUIView.pose = hudPose;
 
         // Wait on the frame
@@ -406,24 +443,6 @@ namespace BF2VR {
         if (result != XR_SUCCESS) {
             Logging::Log("[OPENXR] Could not wait on swapchain image", result);
         }
-
-        // Wait on the UI
-        swapchainImageAcquireInfo = { XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
-        result = xrAcquireSwapchainImage(xrSwapchains.at(2), &swapchainImageAcquireInfo,
-            &uiSwapchainImageIndex);
-        if (result == XR_ERROR_CALL_ORDER_INVALID) {
-            return;  // Ignore
-        }
-        if (result != XR_SUCCESS) {
-            Logging::Log("[OPENXR] Could not acquire swapchain image for UI", result);
-        }
-
-        swapchainImageWaitInfo = { XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
-        swapchainImageWaitInfo.timeout = XR_INFINITE_DURATION;
-        result = xrWaitSwapchainImage(xrSwapchains.at(2), &swapchainImageWaitInfo);
-        if (result != XR_SUCCESS && result != XR_ERROR_CALL_ORDER_INVALID) {
-            Logging::Log("[OPENXR] Could not wait on swapchain image for UI", result);
-        }
     }
 
     void OpenXRService::AfterDraw() {
@@ -431,26 +450,21 @@ namespace BF2VR {
         int currentEye = leftEye ? 0 : 1;
         XrSwapchainImageReleaseInfo swapchainImageReleaseInfo = { XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
         XrResult result = xrReleaseSwapchainImage(xrSwapchains.at(currentEye), &swapchainImageReleaseInfo);
-        if (result == XR_ERROR_CALL_ORDER_INVALID) {
-            return;  // Ignore
-        }
-        if (result != XR_SUCCESS && result != XR_ERROR_CALL_ORDER_INVALID) {
+        if (result != XR_SUCCESS) {
             Logging::Log("[OPENXR] Could not release swapchain image", result);
             return;
-        }
-
-        // Release the swapchain image for UI
-        if (leftEye) {
-            swapchainImageReleaseInfo = { XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
-            result = xrReleaseSwapchainImage(xrSwapchains.at(2), &swapchainImageReleaseInfo);
-            if (result != XR_SUCCESS && result != XR_ERROR_CALL_ORDER_INVALID) {
-                Logging::Log("[OPENXR] Could not release swapchain image for UI", result);
-                return;
-            }
         }
     }
 
     void OpenXRService::EndFrame() {
+        // Release the swapchain image for UI. Again, this is done here becuase there is only one UI target
+        XrSwapchainImageReleaseInfo swapchainImageReleaseInfo = { XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
+        XrResult result = xrReleaseSwapchainImage(xrSwapchains.at(2), &swapchainImageReleaseInfo);
+        if (result != XR_SUCCESS) {
+            Logging::Log("[OPENXR] Could not release swapchain image for UI", result);
+            return;
+        }
+
         // End the frame
         XrCompositionLayerProjection xrLayerProj = { XR_TYPE_COMPOSITION_LAYER_PROJECTION };
         xrLayerProj.space = xrSpace;
@@ -467,8 +481,8 @@ namespace BF2VR {
         frameEndInfo.layerCount = (xrLayer == nullptr ? 0 : 1) + (uiLayer == nullptr ? 0 : 1);
         frameEndInfo.layers = xrLayers;
 
-        XrResult result = xrEndFrame(xrSession, &frameEndInfo);
-        if (result != XR_SUCCESS && result != XR_ERROR_CALL_ORDER_INVALID && result != XR_ERROR_LAYER_INVALID) {
+        result = xrEndFrame(xrSession, &frameEndInfo);
+        if (result != XR_SUCCESS) {
             Logging::Log("[OPENXR] Could not end frame", result);
             return;
         }

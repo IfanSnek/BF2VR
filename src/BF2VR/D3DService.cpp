@@ -26,16 +26,15 @@ namespace BF2VR {
             return;
         }
 
-        if (!hasBeganFrame && OpenXRService::leftEye) {
+        if (drawStage == COMPLETE) {
             // Start on left eye
             OpenXRService::WaitBeginFrame();
-            hasBeganFrame = true;
+            drawStage = WAITED;
         }
 
-        if (!hasBeganDrawing) {
-            // Start on left eye
+        if (drawStage == WAITED || drawStage == DRAWN_L) {
             OpenXRService::BeforeDraw();
-            hasBeganDrawing = true;
+            drawStage = (drawStage == WAITED ? DRAWING_L : DRAWING_R);
         }
 
         // Aquire openxr RTV
@@ -51,25 +50,17 @@ namespace BF2VR {
         drawHook.call<void>(pContext, VertexCount, StartVertexLocation);
     }
 
-    __int64 D3DService::uiDetour(__int64 param_1, __int64 param_2, __int64 param_3, int param_4, int param_5, int param_6, int param_7, __int64 param_8, __int64 param_9) {
+    void D3DService::OnUIDraw() {
         if (!OpenXRService::xrRunning) {
-            return uiHook.call<__int64>(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9);
+            return;
         }
 
         // Aquire openxr RTV for UI
         ID3D11RenderTargetView* uiRTV = OpenXRService::xrRTVs.at(2).at(OpenXRService::uiSwapchainImageIndex);
         if (uiRTV == nullptr) {
-            return 1;
+            return;
         }
-
-        ID3D11DepthStencilView* dsv = nullptr;
-        pContext->OMGetRenderTargets(1, nullptr, &dsv);
-        if (dsv == nullptr) {
-            return 1;
-        }
-
-        pContext->OMSetRenderTargets(1, &uiRTV, dsv);
-        return uiHook.call<__int64>(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9);
+        pContext->OMSetRenderTargets(1, &uiRTV, nullptr);
     }
 
     HRESULT D3DService::PresentDetour(IDXGISwapChain* swapChain, UINT syncInterval, UINT flags) {
@@ -91,14 +82,14 @@ namespace BF2VR {
             toReturn = presentHook.call<HRESULT>(swapChain, syncInterval, flags);
         }
 
-        if (hasBeganDrawing) {
+        if (drawStage == DRAWING_L || drawStage == DRAWING_R) {
             OpenXRService::AfterDraw();
-            hasBeganDrawing = false;
+            drawStage = (drawStage == DRAWING_L ? DRAWN_L : DRAWN_R);
         }
 
-        if (!OpenXRService::leftEye && hasBeganFrame) {
+        if (drawStage == DRAWN_R) {
             OpenXRService::EndFrame();
-            hasBeganFrame = false;
+            drawStage = COMPLETE;
         }
 
         // Clear the RTV for the HUD
@@ -157,7 +148,11 @@ namespace BF2VR {
 
         auto pContextTable = *reinterpret_cast<void***>(pContext);
         drawHook = safetyhook::create_inline(reinterpret_cast<void*>(pContextTable[13]), reinterpret_cast<void*>(DrawDetour));
-        uiHook = safetyhook::create_inline(reinterpret_cast<void*>(0x146D48180), reinterpret_cast<void*>(uiDetour));
+
+        safetyhook::MidHookFn drawUIFn = [](safetyhook::Context& ctx) {
+            OnUIDraw();
+        };
+        uiHook = safetyhook::create_mid(reinterpret_cast<void*>(OFFSETUIDRAW), drawUIFn);
 
         Logging::Log("[D3D11] Hooked DirectX");
         return 0;

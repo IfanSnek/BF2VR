@@ -40,7 +40,8 @@ static const DWORD64 OFFSETCAMERA = 0x146FD3E90;
 static const DWORD64 OFFSETBUILDVIEWS = 0x147c4e1a4;
 static const DWORD64 OFFSETRESIZESCREEN = 0x147d94769;
 static const DWORD64 OFFSETPOSE = 0x142150910;
-static const DWORD64 OFFSETUIDRAW = 0x146D48180;
+// This is the instruction after a call to an address that dispatches render commands across the game. This specific call is for the UI
+static const DWORD64 OFFSETUIDRAW = 0x140e23e28;
 static const DWORD64 OFFSETGAMEPADUPDATE = 0x14774d402;
 static const DWORD64 OFFSETPOST = 0x14c659a00;
 
