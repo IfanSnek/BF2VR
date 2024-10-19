@@ -78,21 +78,12 @@ namespace BF2VR {
             if (worldRenderSettings->motionBlurEnable) {
                 worldRenderSettings->motionBlurEnable = false;
             }
-            if (worldRenderSettings->specularLightingEnable) {
-                worldRenderSettings->specularLightingEnable = false;
-            }
-            if (worldRenderSettings->csLightTileCsPathEnable) {
-                worldRenderSettings->csLightTileCsPathEnable = false;
+            if (worldRenderSettings->skyLightingEnable) {
+                worldRenderSettings->skyLightingEnable = false;
             }
             if (worldRenderSettings->outdoorLightEnable) {
                 worldRenderSettings->outdoorLightEnable = false;
             }
-        }
-
-        Skybox* skybox = Skybox::GetInstance();
-        if (isValidPtr(skybox)) {
-            skybox->mapping = {};
-            skybox->mapping.y.z = 35;  // Makes it not washed out
         }
 
         // Set post options for the user
