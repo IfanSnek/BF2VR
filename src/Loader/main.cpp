@@ -15,6 +15,7 @@
 #include <direct.h>
 #include <ShlObj_core.h>
 #include <iostream>
+#include <string>
 
 DWORD PIDFromName(const char* processName) {
     HANDLE hProcessSnap;

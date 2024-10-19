@@ -116,8 +116,8 @@ class RenderView {
 
 class Skybox {
  public:
-     char pad_0000[712]; //0x0000
-     bool enable; //0x02C8
+     char pad_0000[712];  // 0x0000
+     bool enable;  // 0x02C8
 
     static Skybox* GetInstance() {
         __int64 off1 = *reinterpret_cast<__int64*>(OFFSETSKYBOX);
@@ -167,11 +167,11 @@ class GameRenderer {
 
 class WorldRenderSettings {
  public:
-    char pad_0000[428]; //0x0000
-    bool motionBlurEnable; //0x01AC
-    char pad_01AD[59]; //0x01AD
-    bool skyLightingEnable; //0x01E8
-    char pad_01E9[403]; //0x01E9
+    char pad_0000[428];  // 0x0000
+    bool motionBlurEnable;  // 0x01AC
+    char pad_01AD[59];  // 0x01AD
+    bool skyLightingEnable;  // 0x01E8
+    char pad_01E9[403];  // 0x01E9
     float aaDisocclusionFactor;  // 0x037C
     char pad_0380[394];  // 0x0380
     bool specularLightingEnable;  // 0x050A
