@@ -28,14 +28,19 @@ project(BF2VR)
 add_library(
         BF2VR MODULE
         "src/BF2VR/main.cpp"
-        "src/BF2VR/OpenXRService.cpp"
-        "src/BF2VR/Logging.cpp"
-        "src/BF2VR/D3DService.cpp"
-        "src/BF2VR/BF2Service.cpp"
-        "src/BF2VR/ActionsService.cpp"
+        "src/BF2VR/Engine/BF2Service.cpp"
+        "src/BF2VR/Rendering/D3DService.cpp"
+        "src/BF2VR/Utils/Logging.cpp"
+        "src/BF2VR/VR/ActionsService.cpp"
+        "src/BF2VR/VR/OpenXRService.cpp"
 )
 target_include_directories(
         BF2VR PRIVATE
+        "src/BF2VR"
+        "src/BF2VR/Engine"
+        "src/BF2VR/Rendering"
+        "src/BF2VR/Utils"
+        "src/BF2VR/VR"
         "${OPENXR_SOURCE_DIR}/include"
         "${safetyhook_SOURCE_DIR}/include"
 )

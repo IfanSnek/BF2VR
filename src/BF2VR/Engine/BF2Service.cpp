@@ -10,11 +10,12 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-#include "BF2Service.h"
-#include "SDK.h"
-#include "Logging.h"
-#include "ActionsService.h"
-#include "D3DService.h"
+#include <Engine/BF2Service.h>
+#include <OpenXRService.h>
+#include <Classes.h>
+#include <Logging.h>
+#include <ActionsService.h>
+#include <D3DService.h>
 
 namespace BF2VR {
 RenderView* BF2Service::CameraUpdate(RenderView* a1, RenderView* a2) {

@@ -14,11 +14,11 @@
 #include <cstdio>
 #include <Windows.h>
 
-#include "Logging.h"
-#include "BF2Service.h"
-#include "D3DService.h"
-#include "OpenXRService.h"
-#include "ActionsService.h"
+#include <Logging.h>
+#include <BF2Service.h>
+#include <D3DService.h>
+#include <OpenXRService.h>
+#include <ActionsService.h>
 
 namespace BF2VR {
 

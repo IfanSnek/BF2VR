@@ -11,7 +11,7 @@
 // GNU General Public License for more details.
 
 #pragma once
-#include "SDK.h"
+#include <Classes.h>
 #include <safetyhook.hpp>
 #include <Xinput.h>
 

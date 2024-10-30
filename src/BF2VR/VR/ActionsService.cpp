@@ -10,9 +10,10 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-#include "ActionsService.h"
+#include <ActionsService.h>
+#include <OpenXRService.h>
 #include <vector>
-#include "Logging.h"
+#include <Logging.h>
 
 namespace BF2VR {
 int ActionsService::Initialize() {

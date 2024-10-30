@@ -1,5 +1,4 @@
 #pragma once
-#include "OpenXRService.h"
 // Copyright Ethan Porcaro
 
 // This program is free software: you can redistribute it and/or modify
@@ -12,6 +11,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
+#include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
 #include <array>
 
 namespace BF2VR {

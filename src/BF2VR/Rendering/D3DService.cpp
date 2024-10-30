@@ -10,11 +10,11 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-#include "D3DService.h"
-#include "Logging.h"
-#include "OpenXRService.h"
-#include "BF2Service.h"
-#include "SDK.h"
+#include <D3DService.h>
+#include <Logging.h>
+#include <OpenXRService.h>
+#include <BF2Service.h>
+#include <Classes.h>
 #include <d3dcompiler.h>
 #include <string>
 
